@@ -1,22 +1,12 @@
 import WebSocket from 'ws';
 import System from 'systeminformation';
 import consola from 'consola';
-import service from 'os-service';
 
 interface wsClient extends WebSocket {
     active: boolean;
     authorized: boolean;
 }
 
-if (process.argv[2] == '--add') {
-    service.add('pc-mon-server', { programArgs: ['--run'] }, error => {
-        if (error) console.trace(error);
-    });
-    process.exit(0);
-}
-service.run(() => {
-    service.stop(0);
-});
 const start = async () => {
     const ws = new WebSocket.Server({ host: '0.0.0.0', port: 10180 });
 
@@ -38,7 +28,7 @@ const start = async () => {
         Client.on('pong', () => (Client.active = true));
 
         Client.on('message', async data => {
-            if (data === '9M%*q*tJ=Lt5)&BvgMs25aC$S<4vErs}g9CGz9?qE2@,z4Z93~S!.3j;yG8<RGy3') {
+            if (data === process.env.TOKEN) {
                 Client.authorized = true;
             }
         });
@@ -57,4 +47,5 @@ const start = async () => {
         badge: true
     });
 };
-start();
+
+export default start;
